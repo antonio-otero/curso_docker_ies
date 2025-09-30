@@ -7,13 +7,14 @@ En el contexto vamos a tener el fichero `Dockerfile` y un directorio, llamado `a
 En este caso vamos a usar una imagen base de un sistema operativo sin ningún servicio. El fichero `Dockerfile` será el siguiente:
 
 ```Dockerfile
-FROM debian
+# syntax=docker/dockerfile:1
+FROM debian:12
 RUN apt-get update && apt-get install -y python3-pip  && apt-get clean && rm -rf /var/lib/apt/lists/*
-COPY app /usr/share/app
 WORKDIR /usr/share/app
-RUN pip3 install --no-cache-dir -r requirements.txt
+COPY app .
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 EXPOSE 3000
-CMD [ "python3", "app.py"]
+CMD python3 app.py
 ```
 
 Algunas consideraciones:
@@ -47,6 +48,20 @@ $ docker run -d -p 80:3000 --name ejemplo2 josedom24/ejemplo3:v1
 Y acceder con el navegador a nuestra página:
 
 ![ejemplo3](img/ejemplo3.png)
+
+## Versión 2: Desde una imagen con python instalado
+
+En este caso el dichero `Dockerfile` podría ser de esta manera:
+
+```Dockerfile
+# syntax=docker/dockerfile:1
+FROM python:3.12.1-bookworm
+WORKDIR /usr/share/app
+COPY app .
+RUN pip install --no-cache-dir -r requirements.txt
+EXPOSE 3000
+CMD python app.py
+```
 
 ---
 
